@@ -17,6 +17,7 @@ function demo_add_admin_page() {
 add_action( 'admin_menu', 'demo_add_admin_page' );
 add_action("admin_init", 'demo_custom_settings');
 function demo_custom_settings(){
+	register_setting('demo-setting-group', 'profile-picture');
 	register_setting('demo-setting-group', 'first-name');
 	register_setting('demo-setting-group', 'last-name');
 	register_setting('demo-setting-group', 'user-description');
@@ -25,6 +26,7 @@ function demo_custom_settings(){
 	register_setting('demo-setting-group', 'google-plus-handler');
 
 	add_settings_section('demo-sidebar-options', 'Sidebar Options', 'demo_sidebar_options', 'demo');
+	add_settings_field('sidebar-profile-picture', 'Profile Picture', 'demo_sidebar_profile_picture', 'demo', 'demo-sidebar-options');
 	add_settings_field('sidebar-name', 'First Name', 'demo_sidebar_name', 'demo', 'demo-sidebar-options');
 	add_settings_field('sidebar-description', 'User Description', 'demo_sidebar_description', 'demo', 'demo-sidebar-options');
 	add_settings_field('sidebar-twitter', 'Twitter Handler', 'demo_sidebar_twitter', 'demo', 'demo-sidebar-options');
@@ -52,9 +54,15 @@ function demo_sidebar_twitter(){
 	echo "<input type='text' value='$twitter' name='twitter-handler' placeholder='Twitter handler'/><p class='description'>Please input your Twitter username without the @ character.</p>";
 }
 
+function demo_sidebar_profile_picture(){
+	$picture = esc_attr(get_option('profile-picture'));
+	echo "<input type='button' class='button button-secondary' value='Upload profile picture' id='upload-button'/>
+		  <input type='hidden' value='$picture' name='profile-picture' placeholder='Profile picture' id='profile-picture'/>";
+}
+
 function demo_sidebar_description(){
 	$user_description = esc_attr(get_option('user-description'));
-	echo "<input type='text' value='$user_description' name='user_description' placeholder='User description'/>";
+	echo "<input type='text' value='$user_description' name='user-description' placeholder='User description'/>";
 }
 
 function demo_sidebar_facebook(){
@@ -67,7 +75,7 @@ function demo_sidebar_google_plus(){
 	echo "<input type='text' value='$googlePlus' name='google-plus-handler' placeholder='Google Plus handler'/>";
 }
 
-function demo_sanitize_twitter_handler(){
+function demo_sanitize_twitter_handler($input){
 	$output = sanitize_text_field($input);
 	$output = str_replace('@', '', $output);
 	return $output;
