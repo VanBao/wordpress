@@ -1,4 +1,3 @@
-<?php settings_errors()?>
 <?php 
     $firstName = esc_attr(get_option('first-name'));
     $lastName = esc_attr(get_option('last-name'));

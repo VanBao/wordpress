@@ -11,12 +11,14 @@
 
 function demo_add_admin_page() {
 	add_menu_page('Demo Theme Options', 'Demo', 'manage_options', 'demo', 'demo_theme_create_page', 'dashicons-admin-customizer', 110 );
-	add_submenu_page('demo', 'Demo Theme Options', 'General', 'manage_options', 'demo', 'demo_theme_create_page');
+	add_submenu_page('demo', 'Demo Sidebar Options', 'General', 'manage_options', 'demo', 'demo_theme_create_page');
 	add_submenu_page('demo', 'Demo CSS Options', 'Custom CSS', 'manage_options', 'demo_custom_css', 'demo_settings_page');
+	add_submenu_page('demo', 'Demo Theme Options', 'Theme Options', 'manage_options', 'demo_theme', 'demo_theme_support_page');
 }
 add_action( 'admin_menu', 'demo_add_admin_page' );
 add_action("admin_init", 'demo_custom_settings');
 function demo_custom_settings(){
+	//Sidebar Options
 	register_setting('demo-setting-group', 'profile-picture');
 	register_setting('demo-setting-group', 'first-name');
 	register_setting('demo-setting-group', 'last-name');
@@ -24,7 +26,6 @@ function demo_custom_settings(){
 	register_setting('demo-setting-group', 'twitter-handler', 'demo_sanitize_twitter_handler');
 	register_setting('demo-setting-group', 'facebook-handler');
 	register_setting('demo-setting-group', 'google-plus-handler');
-
 	add_settings_section('demo-sidebar-options', 'Sidebar Options', 'demo_sidebar_options', 'demo');
 	add_settings_field('sidebar-profile-picture', 'Profile Picture', 'demo_sidebar_profile_picture', 'demo', 'demo-sidebar-options');
 	add_settings_field('sidebar-name', 'First Name', 'demo_sidebar_name', 'demo', 'demo-sidebar-options');
@@ -32,6 +33,14 @@ function demo_custom_settings(){
 	add_settings_field('sidebar-twitter', 'Twitter Handler', 'demo_sidebar_twitter', 'demo', 'demo-sidebar-options');
 	add_settings_field('sidebar-facebook', 'Facebook Handler', 'demo_sidebar_facebook', 'demo', 'demo-sidebar-options');
 	add_settings_field('sidebar-google-plus', 'Google Plus Handler', 'demo_sidebar_google_plus', 'demo', 'demo-sidebar-options');
+
+	//Theme Support Options
+	register_setting('sunset-theme-support', 'post-formats', 'demo_post_formats_callback');
+	add_settings_section('demo-theme-options', 'Theme Options', 'demo_theme_options', '')
+
+}
+function demo_post_formats_callback($input){
+	return $input;
 }
 
 function demo_sidebar_name(){
@@ -47,6 +56,10 @@ function demo_sidebar_options(){
 
 function demo_theme_create_page() {
 	require_once(get_template_directory() . '/inc/templates/demo-admin.php');
+}
+
+function demo_theme_support_page(){
+	require_once(get_template_directory() . '/inc/templates/demo-theme-support.php');
 }
 
 function demo_sidebar_twitter(){
