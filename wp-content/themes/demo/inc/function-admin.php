@@ -17,6 +17,7 @@ function demo_add_admin_page() {
 }
 add_action( 'admin_menu', 'demo_add_admin_page' );
 add_action("admin_init", 'demo_custom_settings');
+
 function demo_custom_settings(){
 	//Sidebar Options
 	register_setting('demo-setting-group', 'profile-picture');
@@ -35,12 +36,14 @@ function demo_custom_settings(){
 	add_settings_field('sidebar-google-plus', 'Google Plus Handler', 'demo_sidebar_google_plus', 'demo', 'demo-sidebar-options');
 
 	//Theme Support Options
-	register_setting('sunset-theme-support', 'post-formats', 'demo_post_formats_callback');
-	add_settings_section('demo-theme-options', 'Theme Options', 'demo_theme_options', '')
-
+	register_setting('demo-theme-support', 'post-formats');
+	
+	add_settings_section('demo-theme-options', 'Theme Options', 'demo_theme_options', 'demo_theme');
+	add_settings_field('post-formats', 'Post Formats', 'demo_post_formats', 'demo_theme', 'demo-theme-options');
 }
-function demo_post_formats_callback($input){
-	return $input;
+
+function demo_theme_options(){
+	echo 'Activate and Deactivate specific Theme Support Options';
 }
 
 function demo_sidebar_name(){
@@ -48,6 +51,18 @@ function demo_sidebar_name(){
 	$lastName = esc_attr(get_option('last-name'));
 	echo "<input type='text' value='$firstName' name='first-name' placeholder='First Name'/>" . 
 		 "<input type='text' value='$lastName' name='last-name' placeholder='Last Name'/>";
+}
+
+function demo_post_formats(){
+	$options = get_option( 'post_formats' , []);
+	echo '<pre>'.var_dump($options).'</pre>';
+	$formats = array( 'aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat' );
+	$output = '';
+	foreach ( $formats as $format ){
+		$checked = ( @$options[$format] == 1 ? ' checked' : '' );
+		$output .= '<label><input type="checkbox" id="'.$format.'" name="post_formats['.$format.']" value="1" '.$checked.' /> '.$format.'</label><br>';
+	}
+	echo $output;
 }
 
 function demo_sidebar_options(){
