@@ -14,6 +14,7 @@ function demo_add_admin_page() {
 	add_submenu_page('demo', 'Demo Sidebar Options', 'General', 'manage_options', 'demo', 'demo_theme_create_page');
 	add_submenu_page('demo', 'Demo CSS Options', 'Custom CSS', 'manage_options', 'demo_custom_css', 'demo_settings_page');
 	add_submenu_page('demo', 'Demo Theme Options', 'Theme Options', 'manage_options', 'demo_theme', 'demo_theme_support_page');
+	add_submenu_page('demo', 'Demo Contact Form', 'Contact Form', 'manage_options', 'demo_theme_contact', 'demo_theme_contact_form');
 }
 add_action( 'admin_menu', 'demo_add_admin_page' );
 add_action("admin_init", 'demo_custom_settings');
@@ -37,13 +38,31 @@ function demo_custom_settings(){
 
 	//Theme Support Options
 	register_setting('demo-theme-support', 'post-formats');
-	
+	register_setting('demo-theme-support', 'custom-header');
+	register_setting('demo-theme-support', 'custom-background');
 	add_settings_section('demo-theme-options', 'Theme Options', 'demo_theme_options', 'demo_theme');
 	add_settings_field('post-formats', 'Post Formats', 'demo_post_formats', 'demo_theme', 'demo-theme-options');
+	add_settings_field('custom-header', 'Custom Header', 'demo_custom_header', 'demo_theme', 'demo-theme-options');
+	add_settings_field('custom-background', 'Custom Background', 'demo_custom_background', 'demo_theme', 'demo-theme-options');
+
+	// Contact Form
+	register_setting('demo-contact-options', 'activate-contact');
+	add_settings_section('demo-contact-section', 'Contact Form', 'demo_theme_contact', 'demo-theme-contact');
+	add_settings_field('activate-form', 'Activate contact form', 'demo_activate_contact_form', 'demo-theme-contact', 'demo-contact-section');
 }
 
 function demo_theme_options(){
 	echo 'Activate and Deactivate specific Theme Support Options';
+}
+
+function demo_activate_contact_form(){
+	$option = get_option('activate-contact');
+	$checked = ( @$option == 1 ? ' checked' : '' );
+	echo '<label><input type="checkbox" id="activate-contact" name="activate-contact" value="1" '.$checked.' /> Activate contact</label>';
+}
+
+function demo_theme_contact(){
+	echo 'Activate and Deactivate the built-in contact form';
 }
 
 function demo_sidebar_name(){
@@ -53,14 +72,25 @@ function demo_sidebar_name(){
 		 "<input type='text' value='$lastName' name='last-name' placeholder='Last Name'/>";
 }
 
+function demo_custom_header(){
+	$options = get_option( 'custom-header');
+	$checked = ( @$options == 1 ? ' checked' : '' );
+	echo '<label><input type="checkbox" id="custom-header" name="custom-header" value="1" '.$checked.' /> Activate custom header</label>';
+}
+
+function demo_custom_background(){
+	$options = get_option('custom-background');
+	$checked = ( @$options == 1 ? ' checked' : '' );
+	echo '<label><input type="checkbox" id="custom-background" name="custom-background" value="1" '.$checked.' /> Activate custom background</label>';
+}
+
 function demo_post_formats(){
-	$options = get_option( 'post_formats' , []);
-	echo '<pre>'.var_dump($options).'</pre>';
+	$options = get_option( 'post-formats');
 	$formats = array( 'aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat' );
 	$output = '';
 	foreach ( $formats as $format ){
 		$checked = ( @$options[$format] == 1 ? ' checked' : '' );
-		$output .= '<label><input type="checkbox" id="'.$format.'" name="post_formats['.$format.']" value="1" '.$checked.' /> '.$format.'</label><br>';
+		$output .= '<label><input type="checkbox" id="'.$format.'" name="post-formats['.$format.']" value="1" '.$checked.' /> '.$format.'</label><br>';
 	}
 	echo $output;
 }
@@ -77,6 +107,10 @@ function demo_theme_support_page(){
 	require_once(get_template_directory() . '/inc/templates/demo-theme-support.php');
 }
 
+function demo_theme_contact_form(){
+	require_once(get_template_directory() . '/inc/templates/demo-contact-form.php');
+}
+
 function demo_sidebar_twitter(){
 	$twitter = esc_attr(get_option('twitter-handler'));
 	echo "<input type='text' value='$twitter' name='twitter-handler' placeholder='Twitter handler'/><p class='description'>Please input your Twitter username without the @ character.</p>";
@@ -84,8 +118,13 @@ function demo_sidebar_twitter(){
 
 function demo_sidebar_profile_picture(){
 	$picture = esc_attr(get_option('profile-picture'));
-	echo "<input type='button' class='button button-secondary' value='Upload profile picture' id='upload-button'/>
+	if(!empty($picture)){
+		echo "<input type='button' class='button button-secondary' value='Replace profile picture' id='upload-button'/>
+		  <input type='hidden' value='$picture' name='profile-picture' placeholder='Profile picture' id='profile-picture'/> <input type='button' class='button button-secondary' id='remove-picture' value='Remove profile picture'/>";
+	}else{
+		echo "<input type='button' class='button button-secondary' value='Upload profile picture' id='upload-button'/>
 		  <input type='hidden' value='$picture' name='profile-picture' placeholder='Profile picture' id='profile-picture'/>";
+	}
 }
 
 function demo_sidebar_description(){
